@@ -1,61 +1,71 @@
-# Documentation Automation — Project Brief
+# Markdown Documentation Checker
 
-## Purpose
+> **AI-assistance disclosure:** This utility and this project README were created with AI assistance. They demonstrate a small documentation-tooling project; they are not an unaided writing sample for an application that prohibits AI assistance.
 
-Documentation can become inconsistent as a software project changes. A lightweight validation script can catch basic maintenance problems before documentation is published.
+## What it checks
 
-This file describes a proposed portfolio project. It is a project brief, not a claim that the utility has already been implemented.
+The command-line tool scans Markdown files and reports:
 
-## Proposed capabilities
+- Broken relative file links and local heading anchors.
+- Empty sections.
+- Placeholder markers such as `TODO`, `TBD`, and `FIXME`.
+- Required headings, when supplied by the user.
+- A text report or machine-readable JSON output.
 
-The first version should be deliberately small and should:
+It uses the Python standard library and does not make network requests.
 
-1. Find Markdown files under a chosen documentation directory.
-2. Check for required headings in selected documents.
-3. Detect empty or placeholder sections.
-4. Validate relative links to files in the repository.
-5. Print a readable summary showing passed checks and problems found.
+## Requirements
 
-## Suggested implementation
+- Python 3.10 or later.
 
-- **Language:** Python 3
-- **Input:** A repository or documentation directory
-- **Output:** A terminal validation report
-- **Dependencies:** Prefer the Python standard library for the first version.
+No third-party Python packages are required.
 
-## Example usage (planned)
+## Run the checker
+
+From the root of this repository:
 
 ```bash
-python check_docs.py .
+python automation/check_docs.py .
 ```
 
-The command above is an intended interface. It should be documented as usable only after the script is implemented and tested.
+Check for a required heading in every Markdown file:
 
-## Validation rules to define
+```bash
+python automation/check_docs.py . --required-heading "Overview"
+```
 
-| Check | Expected behaviour |
-|---|---|
-| Markdown discovery | Find relevant `.md` files recursively |
-| Required headings | Report configured headings that are missing |
-| Empty sections | Flag headings with no meaningful content before the next heading |
-| Relative links | Report local targets that do not exist |
-| Report summary | Show total files checked and issues by category |
+Print a JSON report:
 
-## Testing plan
+```bash
+python automation/check_docs.py . --format json
+```
 
-Before describing the utility as complete:
+The command exits with:
+- `0` when no issues are found.
+- `1` when one or more documentation issues are found.
+- `2` when the supplied path cannot be read.
 
-- Create a small fixture directory with valid and invalid Markdown files.
-- Test nested relative links.
-- Test links containing anchors.
-- Test documents with missing and empty sections.
-- Confirm the script exits with a non-zero status when validation fails.
-- Record the Python version used for testing.
+## Run the tests
 
-## Limitations to document
+```bash
+python -m unittest discover -s automation/tests -v
+```
 
-The initial version is not intended to validate external URLs, render Markdown, or determine whether technical statements are factually correct. Those checks require separate tools or human review.
+The test suite covers valid local links and anchors, broken links, empty sections, missing required headings, placeholders, and links inside fenced code blocks.
 
-## Implementation status
+## Scope and limitations
 
-**Status: Planned.** Update this section only after the script exists, its behaviour has been tested, and the instructions above match the implementation.
+- Only Markdown files are scanned.
+- Relative inline links and local heading anchors are checked; reference-style Markdown links are not currently parsed.
+- External URLs are not requested or checked.
+- The heading-anchor algorithm is intentionally lightweight and may differ from some Markdown renderers in edge cases.
+- A passing report checks document structure and local references. It does not establish that technical statements are correct or that instructions work. Human review and product testing are still required.
+
+## Project files
+
+- `check_docs.py` — command-line validator.
+- `tests/test_check_docs.py` — standard-library unit tests.
+
+## Verification
+
+The included tests were run with Python's `unittest` runner. Re-run the test command above after changing the checker.
